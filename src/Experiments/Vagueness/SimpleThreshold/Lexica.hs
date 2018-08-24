@@ -51,4 +51,5 @@ baseAdjGTLex = Lexicon "baseAdjGTLex" (\(AdjMessage m) -> runAdjGT m 0.5)
 ------------------------------------------------------------------------------
 adjLexes :: [Lexicon AdjMessage World]
 adjLexes =
-  [ Lexicon ("AdjLex" ++ show d) (\(AdjMessage m) w -> runAdjGT m d w) | d <- heights ]
+  [ Lexicon ("AdjLex" ++ show d) (\(AdjMessage m) w -> runAdjGT m d w) | d <- safeHeights ]
+  where safeHeights = 0.01 : tail (init heights) ++ [0.99]

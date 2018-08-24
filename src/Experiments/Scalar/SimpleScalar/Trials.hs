@@ -1,14 +1,11 @@
-{-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE TemplateHaskell #-}
 
 module Experiments.Scalar.SimpleScalar.Trials where
 
 import Experiments.Scalar.SimpleScalar.Domain
 import Experiments.Scalar.SimpleScalar.Lexica
-import Experiments.Scalar.SimpleScalar.LUM
-import Prob
 import Vocab
-import Utils
+import LUMBayes
 import Control.Monad
 
 {--}
@@ -33,32 +30,34 @@ messages =
 
 -- define the RSA parameters for reasoning about joint distributions over
 -- worlds, messages, and SA lexica
-params :: Params (MemoBMC SAMessage (Lexicon SAMessage World) World) SAMessage World
+params :: Params Enumerator SAMessage World
 params = PM
-  { worldPrior   = uniform universe
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform saLexes
+  { worldPrior   = uniformD universe
+  , messagePrior = uniformD messages
+  , lexiconPrior = uniformD saLexes
   , cost         = \x -> if x == SAMessage nil then 5 else 0
   , temp         = 1
   }
 
+-- evaluate distributions at various levels of LUM iteration
+------------------------------------------------------------------------------
 
 main :: IO ()
 main = do
   putStrLn ""
   putStrLn "L0"
   putStrLn "----------"
-  dispL0 baselex params messages
+  dispAgent messages $ \t -> listener 0 params t baselex
 
   putStrLn ""
   putStrLn "S1"
   putStrLn "----------"
-  dispS1 baselex params universe
+  dispAgent universe $ \t -> speaker 1 params t baselex
 
   putStrLn ""
   putStrLn "L1"
   putStrLn "----------"
-  dispL1 params messages
+  dispAgent messages $ \t -> listener 1 params t undefined
 
 
 -- > L0
@@ -83,20 +82,12 @@ main = do
 
 -- for playing with the same parameters under different dist encodings
 ------------------------------------------------------------------------------
-paramsBDDist :: Params BDDist SAMessage World
-paramsBDDist = PM
-  { worldPrior   = uniform universe
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform saLexes
-  , cost         = \x -> if x == SAMessage nil then 5 else 0
-  , temp         = 1
-  }
 
-paramsBMC :: Params BMC SAMessage World
-paramsBMC = PM
-  { worldPrior   = uniform universe
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform saLexes
+paramsSMC :: MonadInfer d => Params (Sequential (Population d)) SAMessage World
+paramsSMC = PM
+  { worldPrior   = uniformD universe
+  , messagePrior = uniformD messages
+  , lexiconPrior = uniformD saLexes
   , cost         = \x -> if x == SAMessage nil then 5 else 0
   , temp         = 1
   }

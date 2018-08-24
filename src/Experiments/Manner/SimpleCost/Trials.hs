@@ -4,9 +4,8 @@ module Experiments.Manner.SimpleCost.Trials where
 
 import Experiments.Manner.SimpleCost.Domain
 import Experiments.Manner.SimpleCost.Lexica
-import LUM
-import Prob
-import Utils
+import LUMBayes
+import Control.Monad (when)
 import Vocab
 
 {--}
@@ -31,49 +30,48 @@ messages =
 
 -- define the RSA parameters for reasoning about joint distributions over
 -- worlds, messages, and lexica
-params :: Dist d => Params d MannerMessage World
+params :: MonadInfer d => Params d MannerMessage World
 params = PM
-  { worldPrior   = weighted $ zipWith Mass [2, 1] universe
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform mannerLexes
-  , cost         = \x -> case lookup x (zip messages [1,2,5]) of {Just c -> c}
+  { worldPrior   = uniformD universe >>= \w -> when (weird w) (factor . Exp . log $ 0.5) >> return w
+  , messagePrior = uniformD messages
+  , lexiconPrior = uniformD mannerLexes
+  , cost         = \x -> case lookup x (zip messages [1, 2, 5]) of {Just c -> c}
   , temp         = 5
   }
-
 
 main :: IO ()
 main = do
   putStrLn ""
   putStrLn "L0"
   putStrLn "----------"
-  dispL0 baselex params messages
+  dispAgent messages (\t -> listener 0 params t baselex)
 
   putStrLn ""
   putStrLn "S1"
   putStrLn "----------"
-  dispS1 baselex params universe
+  dispAgent universe (\t -> speaker 1 params t baselex)
 
   putStrLn ""
   putStrLn "L1"
   putStrLn "----------"
-  dispL1 params messages
+  dispAgent messages (\t -> listener 1 params t baselex)
 
   putStrLn ""
   putStrLn "S2"
   putStrLn "----------"
-  dispSN 2 params universe
+  dispAgent universe (\t -> speaker 2 params t baselex)
 
   putStrLn ""
   putStrLn "L2"
   putStrLn "----------"
-  dispLN 2 params messages
+  dispAgent messages (\t -> listener 2 params t baselex)
 
   putStrLn ""
   putStrLn "S3"
   putStrLn "----------"
-  dispSN 3 params universe
+  dispAgent universe (\t -> speaker 3 params t baselex)
 
   putStrLn ""
   putStrLn "L3"
   putStrLn "----------"
-  dispLN 3 params messages
+  dispAgent messages (\t -> listener 3 params t baselex)

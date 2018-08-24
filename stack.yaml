@@ -39,7 +39,9 @@ packages:
 - .
 # Dependency packages to be pulled from upstream that are not in the resolver
 # (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps:
+- github: adscib/monad-bayes
+  commit: 0275ac649f97e1a0aeeaa3fda6dbe0da3658e0c3
 
 # Override default flag values for local packages and extra-deps
 flags: {}

@@ -18,7 +18,7 @@ type Deg = Double
 data World = W
   { weird'  :: Bool
   }
-  deriving (Eq, Lift)
+  deriving (Eq, Lift, Ord)
 
 baseWorld :: World
 baseWorld = W
@@ -37,3 +37,6 @@ instance Show World where
 
 mannerUniv :: [World]
 mannerUniv = [wNormal, wWeird]
+
+weird :: World -> Bool
+weird = (== wWeird)

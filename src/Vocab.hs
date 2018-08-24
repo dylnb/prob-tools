@@ -68,7 +68,7 @@ data ParseTree a = Nil | PT (Tree String) deriving (Eq, Ord)
 
 instance Show (ParseTree a) where
   show (PT tree)    = foldTree (\x cs -> if null cs then x else intercalate " " cs) tree
-  show Nil          = "----"
+  show Nil          = "<Silence>"
 
 instance Grammar ParseTree where
   s (PT x) (PT f)   = PT $ Node "" [x,f]
@@ -95,8 +95,8 @@ instance AdjLex ParseTree where
   short            = PT $ pure "is short"
 
 instance MannerLex ParseTree where
-  started          = PT $ pure "started"
-  gotStarted       = PT $ pure "got started"
+  started          = PT $ pure "started the car"
+  gotStarted       = PT $ pure "got the car started"
 
 mkMessageInstances ty dat =
   [d| instance Eq $t where

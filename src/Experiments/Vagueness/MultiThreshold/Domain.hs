@@ -15,7 +15,7 @@ type Deg = Double
 data World = W
   { height' :: [(Entity, Deg)]
   }
-  deriving (Eq, Lift)
+  deriving (Eq, Lift, Ord)
 
 baseWorld :: World
 baseWorld = W

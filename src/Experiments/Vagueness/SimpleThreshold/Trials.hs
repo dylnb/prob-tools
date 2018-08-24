@@ -3,9 +3,9 @@ module Experiments.Vagueness.SimpleThreshold.Trials where
 
 import Experiments.Vagueness.SimpleThreshold.Domain
 import Experiments.Vagueness.SimpleThreshold.Lexica
-import LUM
-import Prob
+import LUMBayes
 import Vocab
+import qualified Data.Vector as V
 
 {--}
 
@@ -25,11 +25,11 @@ messages =
 
 -- define the RSA parameters for reasoning about joint distributions over
 -- worlds, messages, and Adj lexica
-params :: Dist d => Params d AdjMessage World
+params :: Params Enumerator AdjMessage World
 params = PM
-  { worldPrior   = normalize 0.5 0.15 (zip universe heights)
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform adjLexes
+  { worldPrior   = (universe !!) <$> logCategorical (V.fromList $ map (normalPdf 0.5 0.15) heights)
+  , messagePrior = uniformD messages
+  , lexiconPrior = uniformD adjLexes
   , cost         = \x -> if x == AdjMessage nil then 0 else 2
   , temp         = 4
   }
@@ -42,17 +42,17 @@ main = do
   putStrLn ""
   putStrLn "L0"
   putStrLn "----------"
-  dispL0 baselex params messages
+  dispAgent messages $ \t -> listener 0 params t baselex
 
   putStrLn ""
   putStrLn "S1"
   putStrLn "----------"
-  dispS1 baselex params universe
+  dispAgent universe $ \t -> speaker 1 params t baselex
 
   putStrLn ""
   putStrLn "L1"
   putStrLn "----------"
-  dispL1 params messages
+  dispAgent messages $ \t -> listener 1 params t undefined
 
 -- > L0
 -- > ----------

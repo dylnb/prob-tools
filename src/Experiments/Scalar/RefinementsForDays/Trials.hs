@@ -4,8 +4,8 @@ module Experiments.Scalar.RefinementsForDays.Trials where
 
 import Experiments.Scalar.RefinementsForDays.Domain
 import Experiments.Scalar.RefinementsForDays.Lexica
-import LUM
-import Prob
+import LUMBayes
+-- import Prob
 import Vocab
 
 
@@ -41,11 +41,11 @@ messages =
 
 -- define the RSA parameters for reasoning about joint distributions over
 -- worlds, messages, and Neo lexica
-params :: Dist d => Params d GQMessage
+params :: Params Enumerator GQMessage
 params = PM
-  { worldPrior   = uniform universe
-  , messagePrior = uniform messages
-  , lexiconPrior = uniform gqLexes
+  { worldPrior   = uniformD universe
+  , messagePrior = uniformD messages
+  , lexiconPrior = uniformD gqLexes
   , cost         = \x -> if x == GQMessage nil then 5 else 0
   , temp         = 1
   }
@@ -58,16 +58,16 @@ main = do
   putStrLn ""
   putStrLn "L0"
   putStrLn "----------"
-  dispL0 baselex params messages
+  dispAgent messages $ \t -> listener 0 params t baselex
 
   putStrLn ""
   putStrLn "S1"
   putStrLn "----------"
-  dispS1 baselex params universe
+  dispAgent universe $ \t -> speaker 1 params t baselex
 
   putStrLn ""
   putStrLn "L1"
   putStrLn "----------"
-  dispL1 params messages
+  dispAgent messages $ \t -> listener 1 params t undefined
 
 --}

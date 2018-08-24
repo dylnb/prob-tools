@@ -1,15 +1,14 @@
--- This file has been generated from package.yaml by hpack version 0.20.0.
+-- This file has been generated from package.yaml by hpack version 0.28.2.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e9047328a2015cc69d685f7d66a248608c06b6f7522614cf8aa4f8a49dfd0593
+-- hash: d3efaa75bc9c356c38b04042fe3b7963c6bdd92b7a42d2eb51d358520da79c0f
 
 name:           prob-tools
 version:        0.1.0.0
-description:    Please see the README on Github at <https://github.com/schar/prob-tools#readme>
+description:    Please see the README on Github at <https://github.com/dylnb/prob-tools#readme>
 build-type:     Simple
 cabal-version:  >= 1.10
-
 extra-source-files:
     README.md
 
@@ -19,11 +18,14 @@ library
   build-depends:
       base >=4.7 && <5
     , containers
-    , monad-memo
+    , log-domain
+    , monad-bayes
+    , mwc-random
     , random
     , semiring-simple
     , template-haskell
     , transformers
+    , vector
   exposed-modules:
       Experiments.Manner.SimpleCost.Domain
       Experiments.Manner.SimpleCost.Lexica
@@ -36,7 +38,6 @@ library
       Experiments.Scalar.RefinementsForDays.Trials
       Experiments.Scalar.SimpleScalar.Domain
       Experiments.Scalar.SimpleScalar.Lexica
-      Experiments.Scalar.SimpleScalar.LUM
       Experiments.Scalar.SimpleScalar.Trials
       Experiments.Vagueness.CostDriven.Domain
       Experiments.Vagueness.CostDriven.Lexica
@@ -47,9 +48,7 @@ library
       Experiments.Vagueness.SimpleThreshold.Domain
       Experiments.Vagueness.SimpleThreshold.Lexica
       Experiments.Vagueness.SimpleThreshold.Trials
-      LUM
-      Prob
-      Utils
+      LUMBayes
       Vocab
   other-modules:
       Paths_prob_tools
@@ -63,12 +62,15 @@ executable prob-tools-exe
   build-depends:
       base >=4.7 && <5
     , containers
-    , monad-memo
+    , log-domain
+    , monad-bayes
+    , mwc-random
     , prob-tools
     , random
     , semiring-simple
     , template-haskell
     , transformers
+    , vector
   other-modules:
       Paths_prob_tools
   default-language: Haskell2010
